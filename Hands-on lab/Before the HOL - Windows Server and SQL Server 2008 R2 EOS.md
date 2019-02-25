@@ -1,7 +1,7 @@
 ![](https://github.com/Microsoft/MCW-Template-Cloud-Workshop/raw/master/Media/ms-cloud-workshop.png "Microsoft Cloud Workshops")
 
 <div class="MCWHeader1">
-[Insert workshop name here]
+Windows Server and SQL Server 2008 R2 end of support planning
 </div>
 
 <div class="MCWHeader2">
@@ -9,7 +9,7 @@ Before the hands-on lab setup guide
 </div>
 
 <div class="MCWHeader3">
-[Insert date here Month Year]
+March 2019
 </div>
 
 
@@ -27,27 +27,27 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 <!-- TOC -->
 
-- [\[insert workshop name here\] before the hands-on lab setup guide](#\insert-workshop-name-here\-before-the-hands-on-lab-setup-guide)
+- [Windows Server and SQL Server 2008 R2 end of support planning before the hands-on lab setup guide](#Windows-Server-and-SQL-Server-2008-R2-end-of-support-planning-before-the-hands-on-lab-setup-guide)
     - [Requirements](#requirements)
     - [Before the hands-on lab](#before-the-hands-on-lab)
-        - [Task 1: Task name](#task-1-task-name)
-        - [Task 2: Task name](#task-2-task-name)
+        - [Task 1: Create VMs](#task1-Create-VMs)
+        - [Task 2: Install WebApp](#task-2-Install-Webapp)
+        - [Task 3: Configure Azure Site Recovery](#task-3-Configure-Azure-Site-Recovery)
 
 <!-- /TOC -->
 
-# \[insert workshop name here\] before the hands-on lab setup guide 
-
+# Windows Server and SQL Server 2008 R2 end of support planning before the hands-on lab setup guide 
 ## Requirements
 
-1.  Number and insert your custom workshop content here . . . 
+1.  Microsoft Azure subscription
 
 ## Before the hands-on lab
 
 Duration: X minutes
 
-\[insert your custom workshop content here . . . 
+In this exercise, you will deploy the source environment for this lab. The source environment is designed to represent the existing on-premises environment you will migrate to Azure. As we will not have access to your real on-premises environment, we will be setting up the "on-premises" environment in another Azure Region.
 
-### Task 1: Task name
+### Task 1: Create the "on-premises" environment
 
 1.  Number and insert your custom workshop content here . . . 
 
