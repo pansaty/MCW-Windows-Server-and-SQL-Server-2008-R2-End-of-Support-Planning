@@ -36,6 +36,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
         - [Task 4: Setup the SQL Server VM and restore the database](#Task-4:-Setup-the-SQL-Server-VM-and-restore-the-database)
         - [Task 5: Deploy the ContosoFinance Web Application](Task-5:-Deploy-the-ContosoFinance-Web-Application)
         - [Task 6: Configure Azure Site Recovery](#task-6-Configure-Azure-Site-Recovery)
+        - [Task 7: Create a Network to recover IIS and SQL VMs to](#Task-7:-Create-a-Network-to-recover-IIS and-SQL-VMs-to)
 
 <!-- /TOC -->
 
@@ -47,7 +48,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 ## Before the hands-on lab
 
-Duration: X minutes
+Duration: 90 minutes
 
 In this exercise, you will deploy the source environment for this lab. The source environment is designed to represent the existing on-premises environment you will migrate to Azure. As we will not have access to your real on-premises environment, we will be setting up the "on-premises" environment in another Azure Region.
 
@@ -186,7 +187,26 @@ In this exercise, you will deploy the source environment for this lab. The sourc
 
    5. Once replication is setup, you can view the status under **Replicated Items** to view the status of synchronizing the VM. This may take up to an hour.
 
-      
+
+### Task 7: Create a Network to recover IIS and SQL VMs to
+
+1. In the [Azure Portal](https://portal.azure.com) navigate to **Virtual Networks**. If Virtual Networks does not appear under the menu blade, search for it by clicking on **All services** and searching for Virtual Networks.
+
+2. With the **Virtual networks** blade open, click on **+ Add**
+
+   1. Provide a name
+
+   2. Optionally change the address space
+
+   3. Create a new resource group
+
+   4. Under location select the same region where you were replicating the Windows Server 2008R2 IIS machine to
+
+   5. Other options can remain as default, hit **Create**
+
+      ![CreateVirtualNetwork](media/CreateVirtualNetwork.png)
+
+
 
 You should follow all steps provided *before* performing the Hands-on lab.
 
