@@ -55,9 +55,9 @@ In this exercise, you will deploy the source environment for this lab. The sourc
 
 1. Browse to the Azure Portal at <https://portal.azure.com> and verify that you are logged in with the subscription that you wish to use for this lab.
 
-2. Click the ![CreateAResource](media\CreateAResource.png)button to create a Windows Server 2008 R2 Machine
+2. Click the ![CreateAResource](media/CreateAResource.png)button to create a Windows Server 2008 R2 Machine
 
-3. In the search bar, search for Windows Server 2008 and select **Windows Server 2008 R2 SP1** and select Create![WindowsServer2008Gallery](media\WindowsServer2008Gallery.png)
+3. In the search bar, search for Windows Server 2008 and select **Windows Server 2008 R2 SP1** and select Create![WindowsServer2008Gallery](media/WindowsServer2008Gallery.png)
 
 4. On the **Basics** page fill in the details according to your environment
 
@@ -69,7 +69,7 @@ In this exercise, you will deploy the source environment for this lab. The sourc
    6.  You do not need a large VM, the default DS1v2 should suffice
    7.  Set Username and Password for the administrator account
    8.  Under Inbound Port Rules select **allow selected ports** and choose **HTTP (80)** and **RDP (3389) ** from the drop down list
-   9.  click **Next: Disks**![CreateVM](media\CreateVM.png)
+   9.  click **Next: Disks**![CreateVM](media/CreateVM.png)
 
    6. On the **Disks** page change the OS Disk type to Standard HDD and click **Next: Networking**![StandardDisk](media\StandardDisk.png)
    7. On the **Networking** page, the default will be to create a new virtual network, leave the default or choose an existing network. Leave defaults for other options and click **Review + Create**
@@ -106,7 +106,7 @@ In this exercise, you will deploy the source environment for this lab. The sourc
 
 10. Once downloaded, launch the webplatform installer and install Web Deploy 3.6 for Hosting Servers
 
-    ![WebDeploy](media\WebDeploy.png)
+    ![WebDeploy](media/WebDeploy.png)
 
     11. Download and install .NET 4.6.1 from [here](https://www.microsoft.com/en-us/download/details.aspx?id=49981)
 
@@ -127,7 +127,7 @@ In this exercise, you will deploy the source environment for this lab. The sourc
 
 1. Download the Web App from Hands-On Labs/lab-files/contoso-finance
 2. Open in Visual Studio Community Edition
-3. Open the web.config file and update the connection string parameters, using the private IP address of the SQL vm created in Task2 as the Data Source![ConnectionString](media\ConnectionString.png)
+3. Open the web.config file and update the connection string parameters, using the private IP address of the SQL vm created in Task2 as the Data Source![ConnectionString](media/ConnectionString.png)
 
 4. In Solution Explorer, right click on ContosoFinance Project and select Publish
 
@@ -139,15 +139,15 @@ In this exercise, you will deploy the source environment for this lab. The sourc
 
    3. On the **CustomProfile screen**, select Web Deploy as the Publish method, leverage the Public IP address of the Windows 2008 VM created in Step 1 for Server and Destination URL, use **Default Web Site** as the site name, the admin account you used when you create the Windows 2008 VM in step 1 in the format of [Servername\UserName]. To ensure that connectivity and all the right components are installed, click **Validate Connection**. You should get a green checkmark as shown below. Click **Save**
 
-      ![CustomProfile](media\CustomProfile.png)
+      ![CustomProfile](media/CustomProfile.png)
 
    4. With the newly created CustomProfile select hit **Publish**
 
-      ![Publish](media\Publish.png)
+      ![Publish](media/Publish.png)
 
    5. After the app is published successfully the ContosoFinance webpage will appear
 
-      ![ContosoFinance](media\ContosoFinance.png)
+      ![ContosoFinance](media/ContosoFinance.png)
 
 ### Task 6: Configure Azure Site Recovery
 
@@ -155,7 +155,7 @@ In this exercise, you will deploy the source environment for this lab. The sourc
 
 2. Create a new Recovery services vault by clicking the **Add** button, give it a name and create a new resource group. **Choose a region different than the region where the Windows 2008 R2 IIS vm was created** and click **Create**
 
-   ![CreateREcoveryVault](media\CreateREcoveryVault.png)
+   ![CreateREcoveryVault](media/CreateREcoveryVault.png)
 
 3. Within a few minutes the new Recovery Vault will be created, you may have to hit Refresh for it to become visible. Click on the newly created vault
 
