@@ -71,7 +71,7 @@ In this exercise, you will deploy the source environment for this lab. The sourc
    8.  Under Inbound Port Rules select **allow selected ports** and choose **HTTP (80)** and **RDP (3389) ** from the drop down list
    9.  click **Next: Disks**![CreateVM](media/CreateVM.png)
 
-   6. On the **Disks** page change the OS Disk type to Standard HDD and click **Next: Networking**![StandardDisk](media\StandardDisk.png)
+   6. On the **Disks** page change the OS Disk type to Standard HDD and click **Next: Networking**![StandardDisk](media/StandardDisk.png)
    7. On the **Networking** page, the default will be to create a new virtual network, leave the default or choose an existing network. Leave defaults for other options and click **Review + Create**
    8. On the **Review + Create** page select **Create**.
 
@@ -133,7 +133,7 @@ In this exercise, you will deploy the source environment for this lab. The sourc
 
 5. Create a new Publishing profile 
 
-   1. On the Publish page click on the Create new profile link![CreateNewProfile](media\CreateNewProfile.png)
+   1. On the Publish page click on the Create new profile link![CreateNewProfile](media/CreateNewProfile.png)
 
    2. On the **Pick a publish target screen**, select **IIS, FTP, etc** and hit ok
 
@@ -151,7 +151,7 @@ In this exercise, you will deploy the source environment for this lab. The sourc
 
 ### Task 6: Configure Azure Site Recovery
 
-1. Go back to the Azure Portal and under **All services** look for **Recovery Services vaults** and select it![FindRecoveryServices](media\FindRecoveryServices.png)
+1. Go back to the Azure Portal and under **All services** look for **Recovery Services vaults** and select it![FindRecoveryServices](media/FindRecoveryServices.png)
 
 2. Create a new Recovery services vault by clicking the **Add** button, give it a name and create a new resource group. **Choose a region different than the region where the Windows 2008 R2 IIS vm was created** and click **Create**
 
