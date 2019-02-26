@@ -69,7 +69,7 @@ In this exercise, you will deploy the source environment for this lab. The sourc
    5.  Leave Availability options to the default
    6.  You do not need a large VM, the default DS1v2 should suffice
    7.  Set Username and Password for the administrator account
-   8.  Under Inbound Port Rules select **allow selected ports** and choose **HTTP (80)** and **RDP (3389) ** from the drop down list
+   8.  Under Inbound Port Rules select **allow selected ports** and choose **HTTP (80)** and **RDP (3389)** from the drop down list
    9.  click **Next: Disks**![CreateVM](media/CreateVM.png)
 
    6. On the **Disks** page change the OS Disk type to Standard HDD and click **Next: Networking**![StandardDisk](media/StandardDisk.png)
