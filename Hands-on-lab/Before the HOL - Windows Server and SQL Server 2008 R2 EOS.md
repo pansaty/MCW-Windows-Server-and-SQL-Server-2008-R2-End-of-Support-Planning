@@ -30,13 +30,10 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 - [Windows Server and SQL Server 2008 R2 end of support planning before the hands-on lab setup guide](#Windows-Server-and-SQL-Server-2008-R2-end-of-support-planning-before-the-hands-on-lab-setup-guide)
     - [Requirements](#requirements)
     - [Before the hands-on lab](#before-the-hands-on-lab)
-        - [Task 1: Create the IIS Windows 2008 R2 VM](#Task-1:-Create-the-IIS-Windows-2008-R2-VM)
-        - [Task 2: Create SQL VM](#Task-2:-Create-SQL-VM)
-        - [Task 3: Install IIS](#Task-3:-Install-IIS)
-        - [Task 4: Setup the SQL Server VM and restore the database](#Task-4:-Setup-the-SQL-Server-VM-and-restore-the-database)
-        - [Task 5: Deploy the ContosoFinance Web Application](Task-5:-Deploy-the-ContosoFinance-Web-Application)
-        - [Task 6: Configure Azure Site Recovery](#task-6-Configure-Azure-Site-Recovery)
-        - [Task 7: Create a Network to recover IIS and SQL VMs to](#Task-7:-Create-a-Network-to-recover-IIS and-SQL-VMs-to)
+        - [Task 1: Create a SQL 2008R2 VM in Azure ](#Task-1:-Create-a-SQL-2008R2-VM in-Azure)
+        - [Task 2: Setup the ContosoFinance Website](#Task-2:-Setup-the-ContosoFinance-Website)
+        - [Task 3: Restore the ContosoFinance Backup file](#Task-3:-Restore-the-ContosoFinance-Backup-file)
+        - [Task 4: Configure Connection string for the ContosoFinance site](#Task-4:-Configure-Connection-string-for-the-ContosoFinance-site)
 
 <!-- /TOC -->
 
@@ -44,167 +41,54 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 ## Requirements
 
 1.  Microsoft Azure subscription
-2.  Visual Studio 2017 Community Edition or higher
+2.  [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) 
+3.  Download the ContosoFinance zip deployment [from Github](https://github.com/pansaty/MCW-Windows-Server-and-SQL-Server-2008-R2-End-of-Support-Planning/blob/master/Hands-on-lab/lab-files/ContosoFinance.zip)
 
 ## Before the hands-on lab
 
-Duration: 90 minutes
+Duration: 30 minutes
 
-In this exercise, you will deploy the source environment for this lab. The source environment is designed to represent the existing on-premises environment you will migrate to Azure. As we will not have access to your real on-premises environment, we will be setting up the "on-premises" environment in another Azure Region.
+In order to focus on the options for moving SQL to Azure, this lab will be focused primarily on tools and options for migrating database to Azure. The lab assumes that you have already refactored your application for Azure WebApps. In a scenario where you may need to keep the application intact as it were on-prem, consider using Azure Site Recovery. 
 
-### Task 1: Create the IIS Windows 2008 R2 VM
+### Task 1: Create a SQL 2008R2 VM in Azure 
 
-1. Browse to the Azure Portal at <https://portal.azure.com> and verify that you are logged in with the subscription that you wish to use for this lab.
+1. With the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) installed on your machine, open a PowerShell command prompt and run the following steps to Create a SQL 2008 R2 machine
+   1. `az login` to login to your subscription. You will be prompted for credentials to authenticate to your account.
+   2. `az create resource group [replace_with_your_resource_group]`  to create a resource group for all items you will be creating for this lab
+   3. `Create SQL 2008 machine here`****
+2. Leave the PowerShell command prompt to complete the steps in the next task
 
-2. Click the ![CreateAResource](media/CreateAResource.png)button to create a Windows Server 2008 R2 Machine
+### Task 2: Setup the ContosoFinance Website
 
-3. In the search bar, search for Windows Server 2008 and select **Windows Server 2008 R2 SP1** and select Create![WindowsServer2008Gallery](media/WindowsServer2008Gallery.png)
+1. With the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) still opened from Task 1, run the following to deploy the ContosoFinance website
+   1. `az webapp create -g [replace_with_your_resource_group] -p ContosoFinance -n ContosoFinance[initials]` to create an App Service plan for your web application, replacing the [place_holders] for your resource group and WebApp name. **Note:** Your WebApp name must be universally unique.
+   2. `az webapp deployment source config-zip --resource-group [replace_with_your_resource_group] --name ContosoFinance[initials] --src [pathtozip]\ContosoFinance.zip` to deploy the ContosoFinance webapp
+2. Close the PowerShell command prompt
 
-4. On the **Basics** page fill in the details according to your environment
+### Task 3: Restore the ContosoFinance  SQL Server Backup file
 
-   1.  Select the right subscription
-   2.  Create a new resource group named sqleol_rg (or reuse an existing)
-   3.  Give the VM a name, ex: w2k8r2-iis
-   4.  Pay attention to the Region selected, you can choose another region close to you or leave as the default
-   5.  Leave Availability options to the default
-   6.  You do not need a large VM, the default DS1v2 should suffice
-   7.  Set Username and Password for the administrator account
-   8.  Under Inbound Port Rules select **allow selected ports** and choose **HTTP (80)** and **RDP (3389)** from the drop down list
-   9.  click **Next: Disks**![CreateVM](media/CreateVM.png)
+This task is also representative of the effort needed to lift and shift a SQL Server 2008R2 instance from on-prem to Azure leveraging a backup/restore methodology. This can be enhanced using the [Microsoft® SQL Server® Backup to Microsoft Azure®Tool](https://www.microsoft.com/en-us/download/details.aspx?id=40740) to backup directly from On-Prem SQL Server to Azure blob storage, however this will require port 443 open from all source SQL Server instances. If this is not an option, you can backup to a central server and then leverage azcopy from a central server to copy backups to Azure blob storage. In addition if you were looking to do a minimal downtime migration for lift and shift where the target in Azure needs to be a SQL Server 2008 R2 instance, you could explore leveraging log shipping.
 
-   6. On the **Disks** page change the OS Disk type to Standard HDD and click **Next: Networking**![StandardDisk](media/StandardDisk.png)
-   7. On the **Networking** page, the default will be to create a new virtual network, leave the default or choose an existing network. Leave defaults for other options and click **Review + Create**
-   8. On the **Review + Create** page select **Create**.
+1. Login to the [Azure Portal](https://portal.azure.com)
 
-### Task 2: Create SQL VM
+2. Navigate to Virtual Machines and download the RDP file for the SQL 2008 R2 VM created in Task 1 and login to it
 
-1. Repeat the same steps as above to create a SQL 2008 VM, with the following differences
-   1. Choose the SQL Server 2008 R2 SP3 Enterprise on Windows Server 2008 R2 image
-   2. Ensure you are creating the VM in the same resource group as the Windows Server from Task 1
-   3. Change the size of the VM to a DS11_v2 
-   4. Under Inbound port rules, only enable **RDP 3389**
-   5. On the networking page, the virtual network should be the same as created in Task 1
+3. Download the ContosoFinance.bak file from GitHub and restore it to the newly created SQL 2008R2 VM. **Note:** In a real migration scenario from on-prem, you could stage the backup file in an Azure blob storage account. 
 
-### Task 3: Install IIS
+4. Launch SSMS and run the following to create a login for the application
 
-1. Once the Windows VM is created (<10 mins). Navigate to **Virtual Machines**, select the newly created VM 
+   `create login AppUser`
 
-2. On the Overview page, notate the Public IP address and click **Connect**. On the **Connect to Virtual Machine** blade, select **Dowload RDP file** and click connect. Leverage the credentials you used to create the VM
+   `create user from login AppUser`
 
-3. After logging into the Virtual machine, open Server Manager
+   `Grant AppRole to AppUser`
 
-4. Navigate to **Roles** under server manager and select Add Roles
+### Task 4: Configure Connection string for the ContosoFinance site
 
-5. Hit **Next** on the **Before You Begin** page
-
-6. Select **Web Server (IIS)** from the **Select Server Roles page** and click next.
-
-7. Click **next** on the **Web Server (IIS)** page
-
-8. Select ASP.NET under Application development on the **Select Role Services page** and add any required role services, click **next** and **Install** on the confirmation page
-
-9. Download the WebPlatform installer from [here](https://www.microsoft.com/web/downloads/platform.aspx)
-
-10. Once downloaded, launch the webplatform installer and install Web Deploy 3.6 for Hosting Servers
-
-    ![WebDeploy](media/WebDeploy.png)
-
-    11. Download and install .NET 4.6.1 from [here](https://www.microsoft.com/en-us/download/details.aspx?id=49981)
-
-### Task 4: Setup the SQL Server VM and restore the database
-
-1. Once the SQLVM is created (<10 mins). Navigate to **Virtual Machines**, select the newly created SQL VM
-2. Navigate to the networking page and notate the Private IP address
-3. Connect to the SQL VM by downloading the RDP File
-4. Add a firewall rule to allow port 1433 within the Windows Firewall [Reference](https://dbatricksworld.com/how-to-open-firewall-ports-on-windows-server-2008-r2/)
-5. Turn off IE Enhanced security [Reference](https://blogs.technet.microsoft.com/chenley/2011/03/10/how-to-turn-off-internet-explorer-enhanced-security-configuration/)
-6. Download the ContosoFinance database [backup file from github](https://github.com/pansaty/MCW-Windows-Server-and-SQL-Server-2008-R2-End-of-Support-Planning/blob/master/Hands-on%20lab/lab-files/ContosoFinance.bak) under Hands-On Labs/lab-files
-7. Launch SQL Server management studio locally
-8. Enable SQL Authentication at the instance and restart the instance from within Management Studio [Reference](https://docs.microsoft.com/en-us/sql/database-engine/configure-windows/change-server-authentication-mode?view=sql-server-2017) 
-9. Restore the downloaded ContosoFinance database
-10. Create a new SQL Login called appuser and grant it dbo access to the restored ContosoFinance database. For simplicity (do not do in production) Uncheck **Enforce Password Policy**, **Enforce password expiration** and **User must change password at next login**
-
-### Task 5: Deploy the ContosoFinance Web Application
-
-1. Download the Web App from Hands-On Labs/lab-files/contoso-finance
-2. Open in Visual Studio Community Edition
-3. Open the web.config file and update the connection string parameters, using the private IP address of the SQL vm created in Task2 as the Data Source![ConnectionString](media/ConnectionString.png)
-
-4. In Solution Explorer, right click on ContosoFinance Project and select Publish
-
-5. Create a new Publishing profile 
-
-   1. On the Publish page click on the Create new profile link![CreateNewProfile](media/CreateNewProfile.png)
-
-   2. On the **Pick a publish target screen**, select **IIS, FTP, etc** and hit ok
-
-   3. On the **CustomProfile screen**, select Web Deploy as the Publish method, leverage the Public IP address of the Windows 2008 VM created in Step 1 for Server and Destination URL, use **Default Web Site** as the site name, the admin account you used when you create the Windows 2008 VM in step 1 in the format of [Servername\UserName]. To ensure that connectivity and all the right components are installed, click **Validate Connection**. You should get a green checkmark as shown below. Click **Save**
-
-      ![CustomProfile](media/CustomProfile.png)
-
-   4. With the newly created CustomProfile select hit **Publish**
-
-      ![Publish](media/Publish.png)
-
-   5. After the app is published successfully the ContosoFinance webpage will appear
-
-      ![ContosoFinance](media/ContosoFinance.png)
-
-### Task 6: Configure Azure Site Recovery
-
-1. Go back to the Azure Portal and under **All services** look for **Recovery Services vaults** and select it![FindRecoveryServices](media/FindRecoveryServices.png)
-
-2. Create a new Recovery services vault by clicking the **Add** button, give it a name and create a new resource group. **Choose a region different than the region where the Windows 2008 R2 IIS vm was created** and click **Create**
-
-   ![CreateREcoveryVault](media/CreateREcoveryVault.png)
-
-3. Within a few minutes the new Recovery Vault will be created, you may have to hit Refresh for it to become visible. Click on the newly created vault
-
-4. To add protection of the Windows 2008 R2 IIS VM click on the **+ Replicate** button
-
-   1. On the Source Blade
-
-      1. Under Source, notice in the dropdown you can choose Azure or On-Premise, for the purpose of this exercise as we are simulating on-premise, we will keep the source as Azure. 
-
-         **Note:**  In order to choose on-premises, there would be additional steps required see [Migrate on-premises machines to Azure](https://docs.microsoft.com/en-us/azure/site-recovery/migrate-tutorial-on-premises-azure)
-
-      2. Under Source Location, choose the region where the Windows 2008 R2 IIS VM resides
-
-      3. Under Source resource group, select the group you created in Task 1 
-
-      4. hit OK
-
-   2. On the Virtual Machines blade
-
-      1. Select the Windows 2008 R2 IIS Machine only and hit OK
-
-   3. On the settings page
-
-      1. Review the setting and click **Create target resources**
-      2. This will take several minutes to complete
-
-   4. Once the above is done, click **Enable replication**. It will take about 10 mins to enable replication and setup the underlying components
-
-   5. Once replication is setup, you can view the status under **Replicated Items** to view the status of synchronizing the VM. This may take up to an hour.
-
-
-### Task 7: Create a Network to recover IIS and SQL VMs to
-
-1. In the [Azure Portal](https://portal.azure.com) navigate to **Virtual Networks**. If Virtual Networks does not appear under the menu blade, search for it by clicking on **All services** and searching for Virtual Networks.
-
-2. With the **Virtual networks** blade open, click on **+ Add**
-
-   1. Provide a name
-
-   2. Optionally change the address space
-
-   3. Create a new resource group
-
-   4. Under location select the same region where you were replicating the Windows Server 2008R2 IIS machine to
-
-   5. Other options can remain as default, hit **Create**
-
-      ![CreateVirtualNetwork](media/CreateVirtualNetwork.png)
+1. Within the [Azure Portal](https://portal.azure.com) navigate to Azure Websites
+2. Open application Settings
+3. Update the connection string leveraging the SQL Server 2008 R2 instance created in Task1 and login credentials created in in Task 2
+4. Go to the Overview page of the the Azure **** and launch ****. If all the configuration steps were completed successfully the ContosoFinance website will launch successfully
 
 
 
