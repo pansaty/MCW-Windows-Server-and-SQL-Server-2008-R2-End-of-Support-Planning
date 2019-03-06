@@ -42,7 +42,8 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 1.  Microsoft Azure subscription
 2.  [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) 
-3.  Download the ContosoFinance zip deployment [from Github](https://github.com/pansaty/MCW-Windows-Server-and-SQL-Server-2008-R2-End-of-Support-Planning/blob/master/Hands-on-lab/lab-files/ContosoFinance.zip)
+3.  Download the [ContosoFinance.zip](https://github.com/pansaty/MCW-Windows-Server-and-SQL-Server-2008-R2-End-of-Support-Planning/blob/master/Hands-on-lab/lab-files/ContosoFinance.zip) deployment from Github
+4.  JSON deployment template and parameters file from Github
 
 ## Before the hands-on lab
 
@@ -53,8 +54,8 @@ In order to focus on the options for moving SQL to Azure, this lab will be focus
 ### Task 1: Create a SQL 2008R2 VM in Azure 
 
 1. With the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) installed on your machine, open a PowerShell command prompt and run the following steps to Create a SQL 2008 R2 machine
-   1. `az login` to login to your subscription. You will be prompted for credentials to authenticate to your account.
-   2. `az create resource group [replace_with_your_resource_group]`  to create a resource group for all items you will be creating for this lab
+   1. `az login` to login to your subscription. You will be prompted for credentials to authenticate to your account via web browser.
+   2. `az group create --name ue_sqleoslab_rg --location "East US"`  to create a resource group for all items you will be creating for this lab
    3. `Create SQL 2008 machine here`****
 2. Leave the PowerShell command prompt to complete the steps in the next task
 
