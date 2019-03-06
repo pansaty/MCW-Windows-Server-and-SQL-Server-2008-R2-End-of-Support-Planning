@@ -43,7 +43,7 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 1.  Microsoft Azure subscription
 2.  [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) 
 3.  Download the [ContosoFinance.zip](https://github.com/pansaty/MCW-Windows-Server-and-SQL-Server-2008-R2-End-of-Support-Planning/blob/master/Hands-on-lab/lab-files/ContosoFinance.zip) deployment from Github
-4.  JSON deployment template and parameters file from Github
+4.  [JSON deployment template](https://github.com/pansaty/MCW-Windows-Server-and-SQL-Server-2008-R2-End-of-Support-Planning/blob/master/Hands-on-lab/lab-files/sql2008r2VM.json) and [parameters file](https://github.com/pansaty/MCW-Windows-Server-and-SQL-Server-2008-R2-End-of-Support-Planning/blob/master/Hands-on-lab/lab-files/parameters.json) from Github
 
 ## Before the hands-on lab
 
@@ -56,13 +56,13 @@ In order to focus on the options for moving SQL to Azure, this lab will be focus
 1. With the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) installed on your machine, open a PowerShell command prompt and run the following steps to Create a SQL 2008 R2 machine
    1. `az login` to login to your subscription. You will be prompted for credentials to authenticate to your account via web browser.
    2. `az group create --name ue_sqleoslab_rg --location "East US"`  to create a resource group for all items you will be creating for this lab
-   3. `Create SQL 2008 machine here`****
-2. Leave the PowerShell command prompt to complete the steps in the next task
+   3. `az group deployment create --resource-group ue_sqleoslab_rg --name SQL2008R2Deployment --template-file [PathToJSONTemplace]\sql2008r2VM.json  --parameters @[PathToParametersFile]\parameters.json` to deploy a SQL Server 2008R2 VM leveraging the [JSON deployment template](https://github.com/pansaty/MCW-Windows-Server-and-SQL-Server-2008-R2-End-of-Support-Planning/blob/master/Hands-on-lab/lab-files/sql2008r2VM.json) and [parameters file](https://github.com/pansaty/MCW-Windows-Server-and-SQL-Server-2008-R2-End-of-Support-Planning/blob/master/Hands-on-lab/lab-files/parameters.json) from Github
+2. Leave the PowerShell command running and go to the next task. It should take < 10 mins to provision this VM
 
 ### Task 2: Setup the ContosoFinance Website
 
-1. With the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) still opened from Task 1, run the following to deploy the ContosoFinance website
-   1. `az webapp create -g [replace_with_your_resource_group] -p ContosoFinance -n ContosoFinance[initials]` to create an App Service plan for your web application, replacing the [place_holders] for your resource group and WebApp name. **Note:** Your WebApp name must be universally unique.
+1. Open a new PowerShell command prompt, run the following to deploy the ContosoFinance website
+   1. `az webapp create -g ue_sqleoslab_rg -p ContosoFinance -n ContosoFinance[initials]` to create an App Service plan for your web application, replacing the [place_holders] for your resource group and WebApp name. **Note:** Your WebApp name must be universally unique.
    2. `az webapp deployment source config-zip --resource-group [replace_with_your_resource_group] --name ContosoFinance[initials] --src [pathtozip]\ContosoFinance.zip` to deploy the ContosoFinance webapp
 2. Close the PowerShell command prompt
 
@@ -72,9 +72,11 @@ This task is also representative of the effort needed to lift and shift a SQL Se
 
 1. Login to the [Azure Portal](https://portal.azure.com)
 
-2. Navigate to Virtual Machines and download the RDP file for the SQL 2008 R2 VM created in Task 1 and login to it
+2. Navigate to Virtual Machines and download the RDP file for the SQL 2008 R2 VM created in Task 1 and login to it using the credentials from the parameters.json file. If the parameters file is unchanged, use username: **sql2008admin** and password: **P@ssw0rd1234**
 
-3. Download the ContosoFinance.bak file from GitHub and restore it to the newly created SQL 2008R2 VM. **Note:** In a real migration scenario from on-prem, you could stage the backup file in an Azure blob storage account. 
+   ![ConnectToVM](media/ConnectToVM.png)
+
+3. Download the [ContosoFinance.bak](https://github.com/pansaty/MCW-Windows-Server-and-SQL-Server-2008-R2-End-of-Support-Planning/blob/master/Hands-on-lab/lab-files/ContosoFinance.bak) file from GitHub and restore it to the newly created SQL 2008R2 VM. **Note:** In a real migration scenario from on-prem, you could stage the backup file in an Azure blob storage account. 
 
 4. Launch SSMS and run the following to create a login for the application
 
