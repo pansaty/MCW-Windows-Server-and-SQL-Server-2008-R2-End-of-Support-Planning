@@ -52,171 +52,136 @@ Microsoft and the trademarks listed at <https://www.microsoft.com/en-us/legal/in
 
 ## Abstract and learning objectives 
 
-In this lab you will be leveraging Azure Site Recovery to perform a lift and shift to Azure for Windows Server 2008 R2 VM hosting IIS and using the [Microsoft® SQL Server® Backup to Microsoft Azure®Tool](https://www.microsoft.com/en-us/download/details.aspx?id=40740) to stream the backup to Azure blob storage
+In this lab you will be analyzing the ContosoFinance DB for compatibility issues with Azure SQLDB leveraging the Data Migration Assistant, fixing any issues and using the Data Migration Service to perform an Online migration from SQL Server 2008R2 to Azure SQLDB
 
 ## Overview
 
-Contoso Finance runs on Windows 2008R2/ SQL 2008R2 on-premises. They purchased an **ISV** application, which requires an upgrade in order to support newer versions of SQL.
+Contoso Finance runs their CRM solution on Windows 2008R2/ SQL 2008R2 on-premises. This application was developed inhouse and their team is looking to modernize to Azure, with minimal development changes but prefer to leverage PaaS vs IaaS. 
 
-They have decided to **REHOST** the application in Azure to continue to get security and stay current as they 
-
-evaluate other ISV solutions to meet their growing business needs.
+They have decided to **REFACTOR** the application in Azure to eliminate the need to continually upgrade/patch the application and DB Server and have decided to migrate to Azure WebApps and Azure SQLDB from IIS/SQL Server 2008R2
 
 ## Solution architecture
 
-![Rehost](media/Rehost.png)
+![Rehost](media/Refactor.png)
 
 ## Requirements
 
 1.  Completed the [Before the HOL - Windows Server and SQL Server 2008 R2 EOS](https://github.com/pansaty/MCW-Windows-Server-and-SQL-Server-2008-R2-End-of-Support-Planning/blob/master/Hands-on%20lab/Before%20the%20HOL%20-%20Windows%20Server%20and%20SQL%20Server%202008%20R2%20EOS.md)
-2.  [Microsoft® SQL Server® Backup to Microsoft Azure®Tool](https://www.microsoft.com/en-us/download/details.aspx?id=40740)
-3.  Port 443 open from the SQL Server VM to *.blob.core.windows.net
 
 ## Before the hands-on lab
 
 Refer to the Before the hands-on lab setup guide manual before continuing to the lab exercises.
 
-## Exercise 1: Failover the IIS machine using ASR
-
-Duration: 15 minutes
-
-In this exercise we will be leveraging ASR to failover the IIS machine to another region to simulate failover from on-premise to Azure.
-
-### Task 1: Perform a test failover
-
-1. Open the [Azure Portal](https://www.portal.azure.com)
-
-2. Open the Recovery Vault that you created in Before the Hands-On lab
-
-3. Navigate to **Replicated items**
-
-4. Select the Windows 2008 R2 IIS VM that we protected
-
-5. Replication status should show Healthy if the environment is ready to failover, click on Test Failover
-
-   ![StatusOfReplication](media/StatusOfReplication.png)
-
-6. On the **Test failover** blade choose the latest processed recovery point and select the Azure Virtual Network you created in Task 7 of Before the Hands-On Lab, which will simulate your Azure Region
-
-7. While this is happening, you can move on to the next Exercise 
-
-
-## Exercise 2: Recover SQL Server 2008 R2 to another region via Backup/Restore
+## Exercise 1: Analyze compatibility with the Data Migration Assistant (DMA)
 
 Duration: 10 minutes
 
-To simulate building out a SQL 2008 R2 machine in Azure for migrating from on-premise to Azure, we will leverage the Gallery image for SQL Server 2008 R2.
+In this exercise we will check for and address compatibility issues with the ContosoFinance database using the DMA tool. During this lab we will only be assessing a single DB, however from the GUI you can select multiple databases from the same instance, or from the [command line](https://docs.microsoft.com/en-us/sql/dma/dma-commandline?view=sql-server-2017) you can perform an assessment across instances and leverage [PowerBI to consolidate Reports across instances](https://docs.microsoft.com/en-us/sql/dma/dma-consolidatereports?view=sql-server-2017). In addition if you are. You can also leverage DMA to [Identify the right Azure SQLDB SKU](https://docs.microsoft.com/en-us/sql/dma/dma-sku-recommend-sql-db?view=sql-server-2017)
 
-**Note:** If you have active Software Assurance and wish to bring your own license to Azure, you will need to create a custom image with SQL Server 2008 R2 media from your volume licensing site
+### Task 1: Perform an Assessment to check for compatibility issues
 
-### Task 1: Create SQL Server 2008 R2 Machine
+1. RDP to the SQL Server 2008R2 VM you created in Before the Hands-On Lab
 
-1.  Open the [Azure Portal](https://www.portal.azure.com)
+2. Download and install the Data Migration Assistant and launch
 
-2.  Click the ![CreateAResource](media/CreateAResource.png)
-3.  Search for SQL Server 2008 R2 and choose the SQL Server 2008 R2 SP3 Enterprise on Windows Server 2008 R2 image
+3. Click on the + New and use the following
 
-4.  Ensure you are creating the VM in the same resource group as the **Network created in Task 7 of Before the Hands-On lab** 
-5.  Provide a unique name
-6.  Choose the same region where you are replicating the Windows Server 2008 R2 IIS VM
-7.  Change the size of the VM to a DS11_v2 
-8.  Specify your admin Username and Password
-9.  Under Inbound port rules, only enable **RDP 3389**
-10.  On the networking page, the virtual network should be the same you created in Task 7 of Before the Hands-On Lab
-11.  Click **Review + create** and once validation is completed, click **Create**
+   1. **Project Type:**  Assessment
 
-## Exercise 3: Backup SQL Database to Storage account
+   2. **Project Name:** ContosoFinance
 
-Duration: 15 minutes
+   3. **Source server type:** SQL Server
 
-In this exercise we will be configuring the Microsoft SQL Server Backup to Microsoft Azure Tool to stream backups from local folder location on the SQL Server VM to an Azure blob storage account.
+   4. **Target server type:** Azure SQL Database. (Optionally, hit the dropdown and note the various target systems the tool supports)
 
-### Task 1: Create Azure Storage Account
+      Click **Create**
 
-1. Open the [Azure Portal](https://www.portal.azure.com)
-2. Click the ![CreateAResource](media/CreateAResource.png)
-3. Select **Storage** and choose **Storage Account**
-4. Select the same resource group that you created the SQL 2008R2 VM in Exercise 2
-5. Provide a unique storage account name
-6. For location, choose the same region as the SQL 2008R2 VM in Exercise 2
-7. Choose Standard performance tier
-8. Account Kind: default value
-9. Replication: Locally-redundant storage
-10. Click **Review + create** and once validation is completed, click **Create**
+4. On the **Options** page leave the defaults selected and click **Next**
 
-### Task 2: Create a container for backups and retrieve the Storage Account keys
+5. On the **Select sources** page enter the public IP of the SQL Server or if running DMA locally you can use **localhost**. Since TLS is not configured, uncheck **Encrypt connection** and click **Connect**
 
-1. Once the storage account is create (Should take less than a minute), navigate to the newly created storage account
+6. Select the ContosoFinance database and click **Add**, then **Start Assessment**
 
-2. Under **Blob service**, click on Blobs then click on **+ Container**
+7. After the Assessment is complete, review both the SQL Server feature parity report and compatibility issues. Although SSRS and SSAS are installing on the machine, they are not used
 
-   1. Create a container named backups and click ok
+8. Under the Compatibility Issues note the Migration Blockers, we will correct in the next excercise.
 
-3. As the Microsoft SQL Server Backup to Windows Azure Tool is an older tool, it does not support storage accounts where only Secure Transfer is enabled (default). If in your environment this is not suitable, you can leverage [AZCopy](https://docs.microsoft.com/en-us/azure/storage/common/storage-use-azcopy) to transfer the backup files to blob storage in Azure. For simplicity we will be leveraging the tool. 
+   
 
-   1. Click on configuration Set **Secure transfer required** option to disabled and click **Save**
+## Exercise 2: Migrate database to Azure SQLDB
 
-4. Under Access Keys, copy key1 to your clipboard/notepad as we will need this for the next task
+Duration: 30 minutes
 
-   ![StorageAccount](media/StorageAccount.png)
+In this exercise we will be migrating the schema and data for the ContosoFinance database from SQL Server 2008 R2 to Azure SQLDB.
 
-### Task 3: Configure Microsoft SQL Server Backup to Microsoft Azure tool
+### Task 1: Create a Logical SQL Server and Azure SQLDB to migrate to
 
-1. Within the Azure Portal, navigate to Virtual Machines
+1. Open a PowerShell command prompt and run the following to create a logical SQL Server and database to migrate to. When prompted enter your AAD credentials to login to your subscription
 
-2. Select the Source SQL Server 2008 R2 Machine created in the Before the Hands-On Labs
+   `az login` 
 
-3. Click connect to RDP into the SQL Server VM
+   `az sql server create --resource-group ue_sqleoslab_rg --name ContosoFinance --admin-user sqladmin --admin-password P@ssw0rd1234 --location eastus`
 
-4. Create a folder at the root of the C: called Backups
+   `az sql db create --name ContosoFinance --server ContosoFinance --resource-group ue_sqleoslab_rg --tier Basic` 
 
-5. Download the [Microsoft® SQL Server® Backup to Microsoft Azure®Tool](https://www.microsoft.com/en-us/download/details.aspx?id=40740)
+### Task 2: Perform a schema migration to Azure SQLDB
 
-6. Open the Microsoft® SQL Server® Backup to Microsoft Azure®Tool
+1. Relaunch the Database Migration Assistant
 
-   1. Click **Add ** on the **Rules** page
-   2. On the **Step 1 of 3** page select the  **A specific path:** radial and browse to C:\Backups. Use the file pattern *.bak and click next
-   3. On the **Step 2 of 3** page, 
-      1. Enter the storage account name create in Task 1, ex: sqleolwestus
-      2. Paste in the Access Key copied in the previous task
-      3. Enter **backups** as the **container name**
-      4. Click on **Verify account** to ensure settings are correct
-      5. Click Next
+2. Click on the + New and use the following
 
-   4. On the **Step 2 of 3** page,
-      1. Select the **Enable encryption** radial and provide a strong password
-      2. Leave **Enable compression** selected 
-      3. click **Finish**
+   1. **Project Type:**  Migration
 
-### Task 4: Backup and Restore Database
+   2. **Project Name:** ContosoFinance
 
-1.  Launch SQL Server Management Studio for the Source SQL Server 2008 R2 VM
-2.  Backup the ContosoFinance database to the folder monitored by the Microsoft® SQL Server® Backup to Microsoft Azure®Tool, i.e C:\Backups
-3.  Browse to C:\Backups and notice the backup size of only 23KB as this is only the stub file that contains the metadata of where the actual backup is on blob storage
+   3. **Source server type:** SQL Server
 
- 
+   4. **Target server type:** Azure SQL Database. 
+
+   5. **Migration Scope:** Schema Only. Note for a simple small POC, you could leverage Schema and Data.
+
+      Click **Create**
+
+3. On the **Select sources** page enter the public IP of the SQL Server or if running DMA locally you can use **localhost**. Since TLS is not configured, uncheck **Encrypt connection** and click **Connect**
+
+4. Select the ContosoFinance database and then click **Next**
+
+5. On the **Select Target** page the Assessment is complete, review both the SQL Server feature parity report and compatibility issues. Although SSRS and SSAS are installing on the machine, they are not used
+
+   *
+
+### Task 3: Leverage the Data Migration Service to migrate data from  
+
+
+
+### Task 4: Update ContosoFinance App Service to point newly migrated Azure SQLDB
+
+### (Optional) Task 5: Test online migration
+
+1. Make change in portal
+2. Make change
+
+## (Optional) Exercise 3: Security Features in Azure SQLDB to protect your Data
+
+### Task 1: Enabling Dynamic Data Masking
+
+### Task 2: Enabling Row Level Security
+
+
 
 ## After the hands-on lab 
 
-Duration: X minutes
+Duration: 5 Minutes
 
-\[insert your custom Hands-on lab content here . . .\]
+After successfully completing this lab, to conserve cost, you can remove all resources created by deleting the resource group. If you prefer to retain the artifacts created as part of this lab do not proceed to the next task
 
-### Task 1: Task name
+### Task 1: Delete resource group
 
-1. Number and insert your custom workshop content here . . .
+1. Open a PowerShell cmd prompt and run the following
 
-   a.  Insert content here
+   `az login` when prompted enter your credentiatls
 
-       i.  
+   `az group delete --name ue_sqleoslab_rg `
 
-### Task 2: Task name
-
-1. Number and insert your custom workshop content here . . .
-
-   a.  Insert content here
-
-       i.  
-
-   You should follow all steps provided *after* attending the Hands-on lab.
+You should follow all steps provided *after* attending the Hands-on lab.
 

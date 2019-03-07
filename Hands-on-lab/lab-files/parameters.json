@@ -26,7 +26,23 @@
                         "destinationPortRange": "3389"
                     }
                 }
+            ],
+		    "value": [
+                {
+                    "name": "SQL",
+                    "properties": {
+                        "priority": 310,
+                        "protocol": "TCP",
+                        "access": "Allow",
+                        "direction": "Inbound",
+                        "sourceAddressPrefix": "*",
+                        "sourcePortRange": "*",
+                        "destinationAddressPrefix": "*",
+                        "destinationPortRange": "1433"
+                    }
+                }
             ]
+
         },
         "subnetName": {
             "value": "default"
@@ -71,7 +87,7 @@
             "value": "Standard_D11"
         },
         "adminUsername": {
-            "value": "pankajadmin"
+            "value": "sql2008admin"
         },
         "adminPassword": {
             "value": "P@ssw0rd1234"
