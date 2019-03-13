@@ -51,7 +51,9 @@ In order to focus on the options for moving SQL to Azure, this lab will be targe
 
    3. Ensure that you have downloaded the  [JSON deployment template](https://github.com/pansaty/MCW-Windows-Server-and-SQL-Server-2008-R2-End-of-Support-Planning/blob/master/Hands-on-lab/lab-files/sql2008r2VM.json) and [parameters file](https://github.com/pansaty/MCW-Windows-Server-and-SQL-Server-2008-R2-End-of-Support-Planning/blob/master/Hands-on-lab/lab-files/parameters.json) from Github, then leverage the below to deploy a SQL 2008 R2 IaaS VM
 
-      `az group deployment create --resource-group ue_sqleoslab_rg --name SQL2008R2Deployment --template-file [PathToJSONTemplace]\sql2008r2VM.json  --parameters @[PathToParametersFile]\parameters.json` 
+      ```
+      az group deployment create --resource-group ue_sqleoslab_rg --name SQL2008R2Deployment --template-file [PathToJSONTemplace]\sql2008r2VM.json  --parameters @[PathToParametersFile]\parameters.json
+      ```
 
       **Note:** This template used a Pay As You Go with the SQL License included Image from the marketplace. If you have active SA and wish to Bring Your Own License, you will have to build a custom image and publish to your subscription
 
@@ -61,8 +63,14 @@ In order to focus on the options for moving SQL to Azure, this lab will be targe
 
 1. Open a new PowerShell command prompt, run the following to deploy the ContosoFinance website
    1. `az appservice plan create -g ue_sqleoslab_rg -n ContosoFinance` to create the app service plan
+
    2. `az webapp create -g ue_sqleoslab_rg -p ContosoFinance -n ContosoFinance[initials]` to create an App Service plan for your web application, replacing the [place_holders] for your resource group and WebApp name. **Note:** Your WebApp name must be universally unique.
-   3. `az webapp deployment source config-zip --resource-group ue_sqleoslab_rg --name ContosoFinance[initials] --src [pathtozip]\ContosoFinance.zip` to deploy the ContosoFinance webapp
+
+   3. ```
+      az webapp deployment source config-zip --resource-group ue_sqleoslab_rg --name ContosoFinance[initials] --src [pathtozip]\ContosoFinance.zip
+      ```
+
+       to deploy the ContosoFinance webapp
 2. Close the PowerShell command prompt
 
 ### Task 3: Restore the ContosoFinance  SQL Server Backup file
@@ -81,7 +89,8 @@ This task is representative of the effort needed to lift and shift a SQL Server 
 
 5. Launch SSMS and run the following to create a login for the application and grant permissions needed
 
-   `USE [master]
+   ```sql
+   USE [master]
    GO
    CREATE LOGIN [AppUser] WITH PASSWORD=N'P@ssw0rd1234', DEFAULT_DATABASE=[ContosoFinance], CHECK_EXPIRATION=OFF, CHECK_POLICY=OFF
    GO
@@ -93,13 +102,22 @@ This task is representative of the effort needed to lift and shift a SQL Server 
    exec sp_addrolemember [db_datawriter] , [AppUser]
    GRANT EXECUTE on [dbo].[GetEngineEdition] to [AppUser]
    GRANT EXECUTE on [dbo].[usp_CustomerWithNoVisits] to [AppUser]
-   GO`
+   GO
+   
+   CREATE LOGIN sqladmin WITH PASSWORD = 'P@ssw0rd1234';
+   
+   GO
+   
+   EXEC master..sp_addsrvrolemember @loginame = N'sqladmin', @rolename = N'sysadmin'
+   
+   GO
+   ```
 
 6. Create a firewall rule to allow inbound on port 1433. If you are not sure how to do this see [here](https://docs.microsoft.com/en-us/sql/database-engine/configure-windows/configure-a-windows-firewall-for-database-engine-access?view=sql-server-2017)
 
 ### Task 4: Configure Connection string for the ContosoFinance site
 
-1. Within the [Azure Portal](https://portal.azure.com) navigate to Azure Websites
+1. Within the [Azure Portal](https://portal.azure.com) navigate to App Services
 
 2. Open App Services(1)->You Web App deployed in Task 2 (2) ->Configuration (Preview) (3) -> Application Settings (4) -> + New Connection (5)
 
@@ -117,7 +135,16 @@ This task is representative of the effort needed to lift and shift a SQL Server 
 
    ![ContosoFinance](media/ContosoFinance.png)
 
+### Task 5: Create the Database Migration Service
 
+1. Leverage the steps outlined [here](https://docs.microsoft.com/en-us/azure/dms/quickstart-create-data-migration-service-portal) to create the DMS with the following Parameters
+   1. **Service Name:** ContosoDMS
+   2. **Resource Group:** ue_sqleoslab_rg
+   3. **Location:** EastUS
+   4. **Virtual Network:** ue_sqleoslab_rg/default
+   5. **Pricing Tier:** Premium 4vCores
+
+   Once the deployment is underway, you can continue to the Hands-On lab as this will take several minutes to deploy
 
 You should follow all steps provided *before* performing the Hands-on lab.
 
